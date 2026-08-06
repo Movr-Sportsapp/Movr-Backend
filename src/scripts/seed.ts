@@ -5,6 +5,14 @@ import { User } from '../models/User';
 import { Event } from '../models/Event';
 import { faker } from '@faker-js/faker';
 
+async function seed() {
+  await mongoose.connect(process.env.MONGO_URI!);
+
+  // 1. Clear existing data so this script is safe to re-run
+  await User.deleteMany({});
+  await Event.deleteMany({});
+
+
 const SPORTS = ['climbing', 'bouldering', 'hiking', 'running', 'cycling', 'swimming', 'cricket', 'rollerskating', 'soccer', 'baseball', 'basketball', 'rugby', 'table tennis', 'badminton'] as const;
 const SKILL_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Open to all levels'] as const;
 
@@ -33,20 +41,21 @@ async function makeFakeUsers(passwordHash: string) {
 };
 }
 
-async function makeFakeEvents() {
+async function makeFakeEvents(users: any[]) {
     return {
     title: `${faker.helpers.arrayElement(SPORTS)} session`,
-
-
+    sport: faker.helpers.arrayElement(SPORTS),
+    creator: faker.helpers.arrayElement(users)._id,
+    city: faker.helpers.arrayElement(['Berlin', 'Hamburg', 'München', 'Frankfurt']),
+    dateTime: faker.date.soon({ days: 60}),
+    // maxParticipants: 
+    // participantCount:
+    skillLevel: faker.helpers.arrayElement(SKILL_LEVELS),
+    public: faker.datatype.boolean({ probability: 0.15 }), // 15% chance of it being true
+    womenOnly: faker.datatype.boolean({ probability: 0.15 }),
     };
 }
 
-async function seed() {
-  await mongoose.connect(process.env.MONGO_URI!);
-
-  // 1. Clear existing data so this script is safe to re-run
-  await User.deleteMany({});
-  await Event.deleteMany({});
 
   // 2. Create some users
   const passwordHash = await bcrypt.hash('password123', 10); // same known password for all seeded users — lets you log in as any of them
@@ -55,7 +64,6 @@ async function seed() {
 // const knownUsers = await User.insertMany([
 // { firstName: 'Marla' ,... }])
 
-
   const fakeUsers = await Promise.all(
     Array.from({ length: 10 }).map(() => makeFakeUsers(passwordHash))
   );
@@ -63,9 +71,13 @@ async function seed() {
   const users = await User.insertMany(fakeUsers);
 
   // 3. Create events, referencing the users you just made
+  const fakeEvents = await Promise.all(
+    Array.from({ length: 10}).map(() => makeFakeEvents(users))
+  );
+
   const events = await Event.insertMany(fakeEvents);
 
-  console.log('Seed complete ✅');
+  console.log(`Seed complete ✅— ${users.length} users, ${events.length} events`);
   await mongoose.disconnect();
 }
 

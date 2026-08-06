@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch --conditions development --env-file=src/.env src/app.ts",
     "build": "npx tsc",
-    "start": "cd dist && node app.js"
+    "start": "cd dist && node app.js",
+    "seed": "ts-node scripts/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "^7.0.2"
   }
 }
