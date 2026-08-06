@@ -36,7 +36,7 @@ async function makeFakeUsers(passwordHash: string, sports: { _id: mongoose.Types
 	lastName: faker.person.lastName(),
 	username: faker.internet.username(),
 	email: faker.internet.email(),
-	password: passwordHash, 
+	passwordHash: passwordHash, 
 	dateOfBirth: faker.date.birthdate({ min: 18, max: 80, mode: 'age'}),
 	gender: faker.helpers.arrayElement(['male', 'female', 'non-binary', 'other']),
   location: { 
@@ -70,11 +70,12 @@ async function makeFakeEvents(users: any[], sports: { _id: mongoose.Types.Object
     status: faker.helpers.weightedArrayElement([{weight: 80, value: 'active'},{ weight: 10, value: 'cancelled'},{ weight: 10, value: 'completed'}]),
     public: faker.datatype.boolean({ probability: 0.15 }), // 15% chance of it being true
     womenOnly: faker.datatype.boolean({ probability: 0.15 }),
+    flintaOnly: faker.datatype.boolean({ probability: 0.10}),
     };
 }
 
 // Seed Sportcollection to capture real _ids
-const sports = await Sport.insertMany(SPORTS.map((name) => ({ name })));
+const sports = await Sport.insertMany(SPORTS.map((name) => ({ name, category: faker.helpers.arrayElement(['Indoor', 'Outdoor']) })));
 
   // 2. Create some users
   const passwordHash = await bcrypt.hash('password123', 10); // same known password for all seeded users — lets you log in as any of them
