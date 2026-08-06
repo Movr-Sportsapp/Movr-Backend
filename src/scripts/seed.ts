@@ -1,10 +1,12 @@
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { User } from '../models/User';
-import { Event } from '../models/Event';
-import { Sport } from '../models/Sport';
-import { faker } from '@faker-js/faker';
+import dotenv from 'dotenv';
+dotenv.config();
+import  User  from '../models/User';
+import  Event from '../models/Event';
+import  Sport  from '../models/Sport';
+import  { faker } from '@faker-js/faker';
 
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI!);
