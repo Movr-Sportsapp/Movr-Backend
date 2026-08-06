@@ -39,7 +39,10 @@ const eventSchema = z.strictObject({
     .optional(),
     status: z
     .enum(["active", "cancelled", "completed"])
-    .optional()
+    .optional(),
+    public: z.boolean().optional(),
+    womenOnly: z.boolean().optional(),
+    flintaOnly: z.boolean().optional()
 });
 
 export { eventSchema };

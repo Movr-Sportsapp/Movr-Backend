@@ -74,6 +74,22 @@ const eventSchema = new Schema(
       enum: ["active", "cancelled", "completed"],
       default: "active",
     },
+
+    public: {
+      type: Boolean,
+      default: false
+    },
+
+    womenOnly: {
+      type: Boolean,
+      default: false
+    },
+
+    flintaOnly: {
+      type: Boolean,
+      default: false
+    },
+    
   },
   {
     timestamps: true,
