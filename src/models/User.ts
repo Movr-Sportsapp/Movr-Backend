@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { required } from "zod/mini";
 
 const userSchema = new Schema(
   {
@@ -18,6 +17,12 @@ const userSchema = new Schema(
       required: [true, "username is required"],
       unique: true,
       trim: true,
+      minlength: [3, "Username must be at least 3 characters"],
+      maxlength: [20, "Username must be at most 20 characters"],
+      match: [
+        /^[a-zA-Z0-9_.]+$/,
+        "Username can only contain letters, numbers, underscores, and periods",
+      ],
     },
     email: {
       type: String,
@@ -43,6 +48,10 @@ const userSchema = new Schema(
     dateOfBirth: {
       type: Date,
       required: true,
+      validate: {
+        validator: (v: Date) => v < new Date(),
+        message: "Date of birth cannot be in the future",
+      },
     },
     bio: {
       type: String,
@@ -62,13 +71,8 @@ const userSchema = new Schema(
       },
 
       coordinates: {
-        latitude: {
-          type: Number,
-        },
-
-        longitude: {
-          type: Number,
-        },
+        latitude: { type: Number, min: -90, max: 90 },
+        longitude: { type: Number, min: -180, max: 180 },
       },
     },
 
