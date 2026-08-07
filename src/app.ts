@@ -1,10 +1,12 @@
 import express from "express";
+import connectDb from "./db/index.ts";
 import cors from "cors";
 import mongoose from "mongoose";
 
 const app = express();
-
+connectDb();
 app.use(express.json());
+
 app.use(cors());
 
 // Health check route
