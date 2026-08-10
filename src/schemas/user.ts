@@ -28,7 +28,7 @@ const userSchema = z.strictObject({
     .regex(/[A-Z]/, "Must contain an uppercase letter")
     .regex(/[0-9]/, "Must contain a number"),
   profileImage: z.string().optional(),
-  gender: z.enum(["male", "female", "non-binary", "other"]).optional(),
+  gender: z.enum(["male", "female", "non-binary", "other"]),
   bio: z.string().max(500).optional(),
   dateOfBirth: z.coerce
     .date()
