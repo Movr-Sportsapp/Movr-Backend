@@ -44,6 +44,7 @@ const userSchema = new Schema(
     gender: {
       type: String,
       enum: ["male", "female", "non-binary", "other"],
+      required: true,
     },
     dateOfBirth: {
       type: Date,
@@ -90,6 +91,10 @@ const userSchema = new Schema(
         },
       },
     ],
+    roles: {
+      type: [String],
+      default: ["user"],
+    },
   },
   { timestamps: true },
 );
