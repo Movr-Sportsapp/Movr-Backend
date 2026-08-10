@@ -7,6 +7,7 @@ import { notFoundHandler } from "./middleware/notFoundHandler.ts";
 import { errorHandler } from "./middleware/errorHandler.ts";
 import { CLIENT_BASE_URL } from "./config.ts";
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.routes.ts";
 
 const app = express();
 connectDb();
@@ -35,6 +36,7 @@ app.get("/api/health", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 // routes
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 
 // error handling
 app.use(notFoundHandler);
