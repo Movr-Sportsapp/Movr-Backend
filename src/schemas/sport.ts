@@ -5,3 +5,5 @@ const sportSchema = z.strictObject({
   category: z.enum(["Indoor", "Outdoor"]),
   icon: z.string().trim().optional(),
 });
+
+export { sportSchema };
