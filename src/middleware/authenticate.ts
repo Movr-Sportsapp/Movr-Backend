@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { verifyAccessToken } from "../utils/jwt.ts";
 import type { AccessTokenPayload } from "../utils/jwt.ts";
 import { HttpError } from "../utils/httpError.ts";
+import type { Request, Response, NextFunction } from "express";
 
 declare global {
   namespace Express {
@@ -32,3 +33,18 @@ export const authenticate: RequestHandler = (req, res, next) => {
     next(new HttpError(401, "Invalid token"));
   }
 };
+
+export const authorize =
+  (...allowedRoles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const userRoles = req.user?.roles ?? [];
+    const hasPermission = userRoles.some((role) => allowedRoles.includes(role));
+
+    if (!hasPermission) {
+      return res.status(403).json({
+        status: "error",
+        message: "Forbidden — insufficient permissions",
+      });
+    }
+    next();
+  };
