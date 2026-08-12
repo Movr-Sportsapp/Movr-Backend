@@ -17,7 +17,7 @@ sportsRouter.get("/", getSports);
 sportsRouter.get("/:id", getSportById);
 
 sportsRouter.post("/", authenticate, validateBodyZod(sportSchema), createSport);
-sportsRouter.put(
+sportsRouter.patch(
   "/:id",
   authenticate,
   validateBodyZod(sportSchema),

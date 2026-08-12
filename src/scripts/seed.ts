@@ -63,6 +63,11 @@ async function seed() {
     }
     return name;
   }
+  function randomTime() {
+    const hour = faker.number.int({ min: 6, max: 22 }); // 6am–10pm, reasonable event hours
+    const minute = faker.helpers.arrayElement(["00", "15", "30", "45"]);
+    return `${String(hour).padStart(2, "0")}:${minute}`;
+  }
   async function makeFakeUsers(
     passwordHash: string,
     sports: { _id: mongoose.Types.ObjectId }[],
@@ -115,6 +120,7 @@ async function seed() {
           : undefined,
       },
       date: faker.date.soon({ days: 60 }),
+      time: randomTime(),
       skillLevel: faker.helpers.arrayElement(SKILL_LEVELS),
       maxParticipants: faker.number.int({ min: 2, max: 12 }),
       participants: { user: faker.helpers.arrayElement(users)._id },
@@ -123,7 +129,7 @@ async function seed() {
         { weight: 10, value: "cancelled" },
         { weight: 10, value: "completed" },
       ]),
-      public: faker.datatype.boolean({ probability: 0.15 }), // 15% chance of it being true
+      isPublic: faker.datatype.boolean({ probability: 0.15 }), // 15% chance of it being true
       womenOnly: faker.datatype.boolean({ probability: 0.15 }),
       flintaOnly: faker.datatype.boolean({ probability: 0.1 }),
     };

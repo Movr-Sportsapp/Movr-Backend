@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { Schema } from "mongoose";
 
 const eventSchema = z.strictObject({
   title: z
@@ -7,20 +8,20 @@ const eventSchema = z.strictObject({
     .min(2, "Title must be at least 2 characters")
     .max(150),
   description: z.string().trim().max(1000).optional(),
-  sports: z.object({ sportId: z.string() }),
-  creator: z.object({ userId: z.string() }),
-  location: z.array(
-    z.object({
-      city: z.string().trim(),
-      coordinates: z
-        .object({
-          latitude: z.number().min(-90).max(90),
-          longitude: z.number().min(-180).max(180),
-        })
-        .optional(),
-    }),
-  ),
+  sport: z.string(),
+  location: z.object({
+    city: z.string().trim().min(1, "City is required"),
+    coordinates: z
+      .object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      })
+      .optional(),
+  }),
   date: z.coerce.date(),
+  time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:mm format"),
   skillLevel: z
     .enum(["Beginner", "Intermediate", "Advanced", "Professional"])
     .optional(),
@@ -34,7 +35,7 @@ const eventSchema = z.strictObject({
     )
     .optional(),
   status: z.enum(["active", "cancelled", "completed"]).optional(),
-  public: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
   womenOnly: z.boolean().optional(),
   flintaOnly: z.boolean().optional(),
 });
