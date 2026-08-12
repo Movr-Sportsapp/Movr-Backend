@@ -43,6 +43,12 @@ const eventSchema = new Schema(
       required: true,
     },
 
+    time: {
+      type: String,
+      required: [true, "Start time is required"],
+      match: [/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:mm format"],
+    },
+
     skillLevel: {
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced", "Professional"],
@@ -75,21 +81,20 @@ const eventSchema = new Schema(
       default: "active",
     },
 
-    public: {
+    isPublic: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     womenOnly: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     flintaOnly: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    
   },
   {
     timestamps: true,

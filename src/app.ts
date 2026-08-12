@@ -9,6 +9,7 @@ import { CLIENT_BASE_URL } from "./config.ts";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.ts";
 import sportsRouter from "./routes/sport.routes.ts";
+import eventRouter from "./routes/event.routes.ts";
 
 const app = express();
 connectDb();
@@ -39,6 +40,7 @@ const PORT = process.env.PORT || 5000;
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/sport", sportsRouter);
+app.use("/events", eventRouter);
 
 // error handling
 app.use(notFoundHandler);
