@@ -18,20 +18,21 @@ async function seed() {
   await Sport.deleteMany({});
 
   const SPORTS = [
-    "climbing",
-    "bouldering",
-    "hiking",
-    "running",
-    "cycling",
-    "swimming",
-    "cricket",
-    "rollerskating",
-    "soccer",
-    "baseball",
-    "basketball",
-    "rugby",
-    "table tennis",
-    "badminton",
+  'Running',
+  'Cycling',
+  'Swimming',
+  'Climbing',
+  'Football',
+  'Basketball',
+  'Tennis',
+  'Yoga',
+  'Hiking',
+  'Volleyball',
+  'Badminton',
+  'CrossFit',
+  'Rollerskating',
+
+
   ] as const;
   const SKILL_LEVELS = [
     "Beginner",
