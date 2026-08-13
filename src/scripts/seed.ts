@@ -31,23 +31,72 @@ async function seed() {
   'Badminton',
   'CrossFit',
   'Rollerskating',
-
-
   ] as const;
+
   const SKILL_LEVELS = [
     "Beginner",
     "Intermediate",
     "Advanced",
     "Professional",
   ] as const;
-  const LOCATIONS = [
-    { city: "Berlin", country: "Germany" },
-    { city: "Hamburg", country: "Germany" },
-    { city: "München", country: "Germany" },
-    { city: "Vienna", country: "Austria" },
-    { city: "Paris", country: "France" },
-    { city: "London", country: "UK" },
-  ];
+
+  //Predefined locations with fitting coordinates so we dont end up in the middle of nowhere
+  type LocationEntry = {
+  country: string;
+  coordinates: { latitude: number; longitude: number }[];
+};
+
+  const LOCATIONS = {
+  Berlin: {
+    country: "Germany",
+    coordinates: [
+      { latitude: 52.4750, longitude: 13.4028 }, // Tempelhofer Feld
+      { latitude: 52.4800, longitude: 13.2300 }, // Grunewald
+    ],
+  },
+  Hamburg: {
+    country: "Germany",
+    coordinates: [
+      { latitude: 53.5910, longitude: 10.0090 }, // Stadtpark Hamburg
+      { latitude: 53.6600, longitude: 10.1100 }, // Duvenstedter Brook
+    ],
+  },
+  "München": {
+    country: "Germany",
+    coordinates: [
+      { latitude: 48.1642, longitude: 11.6050 }, // Englischer Garten
+      { latitude: 48.0700, longitude: 11.5900 }, // Perlacher Forst
+    ],
+  },
+  Paris: {
+    country: "France",
+    coordinates: [
+      { latitude: 48.8640, longitude: 2.2500 }, // Bois de Boulogne
+      { latitude: 48.8280, longitude: 2.4330 }, // Bois de Vincennes
+    ],
+  },
+  London: {
+    country: "UK",
+    coordinates: [
+      { latitude: 51.5073, longitude: -0.1657 }, // Hyde Park
+      { latitude: 51.6500, longitude: 0.0600 },  // Epping Forest
+    ],
+  },
+} satisfies Record<string, LocationEntry>;
+
+// Helper — picks a random city, then a random coordinate pair matching that city
+function randomLocation() {
+  const cities = Object.keys(LOCATIONS) as (keyof typeof LOCATIONS)[];
+  const city = faker.helpers.arrayElement(cities);
+  const { country, coordinates } = LOCATIONS[city];
+  const coord = faker.helpers.arrayElement(coordinates);
+
+  return {
+    city,
+    country,
+    coordinates: faker.datatype.boolean({ probability: 0.8 }) ? coord : undefined,
+  };
+}
 
   function makeSportsInterests(sports: { _id: mongoose.Types.ObjectId }[]) {
     const chosen = faker.helpers.arrayElements(sports, { min: 1, max: 3 });
@@ -86,15 +135,27 @@ async function seed() {
         "non-binary",
         "other",
       ]),
-      location: {
-        ...faker.helpers.arrayElement(LOCATIONS),
-        coordinates: faker.datatype.boolean({ probability: 0.8 })
-          ? {
-              latitude: faker.location.latitude(),
-              longitude: faker.location.longitude(),
-            }
-          : undefined,
-      },
+      location: randomLocation(),
+      profileImage: faker.image.avatar(),
+      bio: faker.person.bio(),
+      sports: makeSportsInterests(sports),
+    };
+  }
+
+//Making known Users for us as test Users:
+async function makeKnownUsers(
+    passwordHash: string,
+    sports: { _id: mongoose.Types.ObjectId }[],
+  ) {
+    return {
+      firstName: 'Marla',
+      lastName: 'Singer',
+      username: 'MarlaS',
+      email: 'test@test.com',
+      passwordHash: passwordHash,
+      dateOfBirth: faker.date.birthdate({ min: 18, max: 80, mode: "age" }),
+      gender: "female",
+      location: randomLocation(),
       profileImage: faker.image.avatar(),
       bio: faker.person.bio(),
       sports: makeSportsInterests(sports),
@@ -111,15 +172,7 @@ async function seed() {
       description: faker.lorem.lines({ min: 2, max: 5 }),
       sport: sport._id,
       creator: faker.helpers.arrayElement(users)._id,
-      location: {
-        ...faker.helpers.arrayElement(LOCATIONS),
-        coordinates: faker.datatype.boolean({ probability: 0.8 })
-          ? {
-              latitude: faker.location.latitude(),
-              longitude: faker.location.longitude(),
-            }
-          : undefined,
-      },
+      location: randomLocation(),
       date: faker.date.soon({ days: 60 }),
       time: randomTime(),
       skillLevel: faker.helpers.arrayElement(SKILL_LEVELS),
@@ -147,19 +200,18 @@ async function seed() {
   // 2. Create some users
   const passwordHash = await bcrypt.hash("Password123", 10); // same known password for all seeded users — lets you log in as any of them
 
-  //  -> If needed add specific users with known credentials for testing purposes
-  // const knownUsers = await User.insertMany([
-  // { firstName: 'Marla' ,... }])
+  // Test-User with known credentials for us to log in
+  const knownUsers = await makeKnownUsers(passwordHash, sports);
 
   const fakeUsers = await Promise.all(
-    Array.from({ length: 10 }).map(() => makeFakeUsers(passwordHash, sports)),
+    Array.from({ length: 13 }).map(() => makeFakeUsers(passwordHash, sports)),
   );
 
-  const users = await User.insertMany(fakeUsers);
+  const users = await User.insertMany([knownUsers, ...fakeUsers]);
 
   // 3. Create events, referencing the users you just made
   const fakeEvents = await Promise.all(
-    Array.from({ length: 10 }).map(() => makeFakeEvents(users, sports)),
+    Array.from({ length: 13 }).map(() => makeFakeEvents(users, sports)),
   );
 
   const events = await Event.insertMany(fakeEvents);
