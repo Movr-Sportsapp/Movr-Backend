@@ -21,14 +21,14 @@ type LoginBody = z.infer<typeof loginSchema>;
 //-------------------------------
 const ACCESS_COOKIE_OPTIONS = {
   httpOnly: true, // !!CRITICAL!! (Stops XSS attacks)
-  sameSite: "strict" as const, // stops CSRF attacks
+  sameSite: isProduction ? ("none" as const) : ("lax" as const), // stops CSRF attacks
   secure: isProduction,
   maxAge: 15 * 60 * 1000,
 };
 
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: "strict" as const,
+  sameSite: isProduction ? ("none" as const) : ("lax" as const),
   secure: isProduction,
   path: "/auth/refresh",
   maxAge: REFRESH_TOKEN_TTL * 1000,
