@@ -306,7 +306,13 @@ export const joinEvent: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 
-    const event = await Event.findById(id);
+    const event = await Event.findById(id)
+      .populate("sport", "name category icon")
+      .populate("creator", "firstName lastName username profileImage")
+      .populate(
+        "participants.user",
+        "firstName lastName username profileImage",
+      );
     if (!event) return res.status(404).json({ message: "Event not found" });
 
     if (event.status !== "active") {
