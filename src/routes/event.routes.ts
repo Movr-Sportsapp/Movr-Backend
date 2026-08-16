@@ -7,6 +7,7 @@ import {
   deleteEvent,
   getEventById,
   getEvents,
+  joinEvent,
   updateEvent,
 } from "../controllers/eventController.ts";
 
@@ -16,4 +17,5 @@ eventRouter.get("/:id", getEventById);
 eventRouter.post("/", authenticate, validateBodyZod(eventSchema), createEvent);
 eventRouter.patch("/:eventId", authenticate, updateEvent);
 eventRouter.delete("/:id", authenticate, deleteEvent);
+eventRouter.post("/:id/join", authenticate, joinEvent);
 export default eventRouter;

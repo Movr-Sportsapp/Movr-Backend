@@ -300,3 +300,44 @@ export const deleteEvent: RequestHandler = async (req, res) => {
     }
   }
 };
+
+export const joinEvent: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+
+    const event = await Event.findById(id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    if (event.status !== "active") {
+      return res
+        .status(400)
+        .json({ message: "This event is not open for joining" });
+    }
+
+    const alreadyJoined = event.participants.some(
+      (p) => p.user?.toString() === userId,
+    );
+    if (alreadyJoined) {
+      return res.status(409).json({ message: "You already joined this event" });
+    }
+    if (event.participants.length >= event.maxParticipants) {
+      return res.status(400).json({ message: "Event is full" });
+    }
+
+    event.participants.push({ user: userId, joinedAt: new Date() });
+    await event.save();
+
+    const populated = await event.populate(
+      "participants.user",
+      "username profileImage",
+    );
+    res.json({ data: populated });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};
