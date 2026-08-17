@@ -347,3 +347,47 @@ export const joinEvent: RequestHandler = async (req, res) => {
     }
   }
 };
+
+export const leaveEvent: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+
+    const event = await Event.findById(id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    const wasJoined = event.participants.some(
+      (p) => p.user?.toString() === userId,
+    );
+    if (!wasJoined) {
+      return res
+        .status(409)
+        .json({ message: "You are not part of this event" });
+    }
+
+    if (event.creator.toString() === userId) {
+      return res
+        .status(400)
+        .json({ message: "Host cannot leave their own event" });
+    }
+
+    await Event.updateOne(
+      { _id: id },
+      { $pull: { participants: { user: userId } } },
+    );
+
+    const updated = await Event.findById(id).populate([
+      { path: "participants.user", select: "username profileImage" },
+      { path: "sport" },
+      { path: "creator", select: "firstName lastName username profileImage" },
+    ]);
+
+    res.status(200).json({ data: updated });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
+};

@@ -8,6 +8,7 @@ import {
   getEventById,
   getEvents,
   joinEvent,
+  leaveEvent,
   updateEvent,
 } from "../controllers/eventController.ts";
 
@@ -18,4 +19,5 @@ eventRouter.post("/", authenticate, validateBodyZod(eventSchema), createEvent);
 eventRouter.patch("/:eventId", authenticate, updateEvent);
 eventRouter.delete("/:id", authenticate, deleteEvent);
 eventRouter.post("/:id/join", authenticate, joinEvent);
+eventRouter.delete("/:id/join", authenticate, leaveEvent);
 export default eventRouter;
