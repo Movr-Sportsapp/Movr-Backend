@@ -173,6 +173,11 @@ export const login: RequestHandler = async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         roles: user.roles,
+        gender: user.gender,
+        bio: user.bio,
+        sport: user.sports,
+        location: user.location,
+        profileImage: user.profileImage,
       },
     });
   } catch (error) {
