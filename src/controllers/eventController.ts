@@ -6,6 +6,20 @@ import mongoose from "mongoose";
 
 type eventInput = z.infer<typeof eventSchema>;
 
+//Haversine helper function
+function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export const getEvents: RequestHandler = async (req, res) => {
   try {
     const {
@@ -14,8 +28,8 @@ export const getEvents: RequestHandler = async (req, res) => {
       skillLevel,
       date,
       status,
-      latitude,
-      longitude,
+      lat,
+      lng,
       radius,
     } = req.query;
 
@@ -64,23 +78,27 @@ export const getEvents: RequestHandler = async (req, res) => {
         $lte: endOfDay,
       };
     }
-    if (latitude && longitude) {
-      filter["location.coordinates"] = {
-        $near: {
-          $geometry: {
-            type: "Point",
-            coordinates: [Number(longitude), Number(latitude)],
-          },
-          $maxDistance: Number(radius) * 1000,
-        },
-      };
-    }
-
-    const events = await Event.find(filter)
+    
+    let events = await Event.find(filter)
       .populate("sport", "name category icon")
       .populate("creator", "firstName lastName username profileImage")
       .populate("participants.user", "firstName lastName username profileImage")
       .sort({ date: 1 });
+    
+    if (lat && lng && radius) {
+      events = events.filter((event) => {
+        const coords = event.location?.coordinates;
+        if (!coords?.latitude || !coords?.longitude ) return false;
+
+      const distance = getDistanceKm(
+        Number(lat),
+        Number(lng),
+        coords.latitude,
+        coords.longitude,
+      );
+      return distance <= Number(radius);
+      });
+    }
 
     return res.status(200).json({
       status: "success",
@@ -95,6 +113,8 @@ export const getEvents: RequestHandler = async (req, res) => {
     }
   }
 };
+
+
 
 export const getEventById: RequestHandler = async (req, res) => {
   try {
