@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import User from "../models/User.ts";
-import type { userSchema } from "#schemas/user.ts";
+import type { userSchema } from "../schemas/user.ts";
 import z from "zod";
 import mongoose from "mongoose";
 
