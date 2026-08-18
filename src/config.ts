@@ -1,6 +1,7 @@
 import z from "zod";
 
 const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]),
   MONGO_URI: z.string(),
   SALT_ROUNDS: z.coerce.number().default(12),
   ACCESS_JWT_SECRET: z.string().min(64),
