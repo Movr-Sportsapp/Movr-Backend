@@ -17,7 +17,7 @@
     "noImplicitOverride": true, // Requires 'override' keyword when overriding methods
     /* Node Options*/
     "allowImportingTsExtensions": true, // Allows importing files with .ts extensions
-    "rewriteRelativeImportExtensions": true, // Rewrites relative imports with correct extensions
+    //"rewriteRelativeImportExtensions": true, // Rewrites relative imports with correct extensions
     "module": "preserve", // Preserves ES module syntax (important for native ESM)
     "noEmit": false, // Enables output generation
     "rootDir": "./src", // Keeps emitted files rooted at src/
