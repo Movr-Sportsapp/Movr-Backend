@@ -118,6 +118,11 @@ export const register: RequestHandler = async (req, res, next) => {
         firstName: newUser.firstName,
         lastName: newUser.lastName,
         roles: newUser.roles,
+        gender: newUser.gender,
+        bio: newUser.bio,
+        sport: newUser.sports,
+        location: newUser.location,
+        profileImage: newUser.profileImage,
       },
     });
   } catch (error) {
